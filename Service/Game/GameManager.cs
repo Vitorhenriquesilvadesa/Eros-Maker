@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using EventSystem;
+using Controller.Grid;
 using Service.Application;
 using Service.Application.Exception;
 using Service.Initialization;
@@ -13,6 +13,11 @@ namespace Service.Game
     public class GameManager : MonoBehaviour
     {
         private static GameManager _instance;
+
+        [Header("Required Controllers for Initialization")] [SerializeField]
+        private GridRenderingController gridRenderingController;
+
+        [SerializeField] private GridMovementController gridMovementController;
 
         private static GameManager Instance
         {
@@ -31,12 +36,15 @@ namespace Service.Game
             }
         }
 
+        public static GridRenderingController GridRenderingController => Instance.gridRenderingController;
+        public static GridMovementController GridMovementController => Instance.gridMovementController;
+
         private ServiceProvider<InitializationService> initializationServiceProvider;
         private ServiceProvider<ApplicationService> applicationServiceProvider;
 
         private List<InitializationService> initializationServices;
         private Dictionary<Type, ApplicationService> applicationServices;
-        
+
         private void Awake()
         {
             initializationServiceProvider = new InitializationServiceProvider();
@@ -44,11 +52,9 @@ namespace Service.Game
             initializationServices = new List<InitializationService>();
             applicationServices = new Dictionary<Type, ApplicationService>();
 
-
             RegisterInitializationServices();
-            RunInitializationServices();
-
             RegisterApplicationServices();
+            RunInitializationServices();
         }
 
         private void Start()
@@ -104,21 +110,20 @@ namespace Service.Game
 
         private void RegisterApplicationServices()
         {
-            RegisterApplicationService<PrintHelloService>();
-            RegisterApplicationService<WhoSayHelloService>();
+            RegisterApplicationService<GridManagementService>();
         }
 
         private void RegisterInitializationService<T>() where T : InitializationService
         {
             InitializationService service = initializationServiceProvider.Get<T>();
-            Debug.Log($"Adding service {service.GetType().Name}");
+            Debug.Log($"Adding Initialization Service: {service.GetType().Name}");
             initializationServices.Add(service);
         }
 
         private void RegisterApplicationService<T>() where T : ApplicationService
         {
             ApplicationService service = applicationServiceProvider.Get<T>();
-            Debug.Log($"ADDING APPLICATION SERVICE: {service.GetType().Name}");
+            Debug.Log($"Adding Application Service: {service.GetType().Name}");
             applicationServices[service.GetType()] = service;
         }
 

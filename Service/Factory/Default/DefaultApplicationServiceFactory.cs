@@ -9,8 +9,7 @@ namespace Service.Factory.Default
         {
             return typeof(S) switch
             {
-                { } t when t == typeof(PrintHelloService) => new PrintHelloService(),
-                { } t when t == typeof(WhoSayHelloService) => new WhoSayHelloService(),
+                { } t when t == typeof(GridManagementService) => new GridManagementService(),
                 _ => throw new UnknownServiceException()
             };
         }

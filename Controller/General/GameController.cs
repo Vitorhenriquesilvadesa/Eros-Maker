@@ -1,12 +1,13 @@
-﻿using UnityEngine;
-using UnityEngine.Serialization;
+﻿using Controller.Grid;
+using UnityEngine;
 
-namespace Controller
+namespace Controller.General
 {
     public class GameController : MonoBehaviour
     {
         private PlayerController _playerController;
 
+        [SerializeField] private GridRenderingController gridRenderingController;
         [SerializeField] private MovementController movementController;
 
         private static GameController _instance;
@@ -29,6 +30,7 @@ namespace Controller
         }
 
         public static MovementController MovementController => Instance.movementController;
+        public static GridRenderingController GridRenderingController => Instance.gridRenderingController;
 
 
         public void Awake()

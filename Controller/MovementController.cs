@@ -1,6 +1,4 @@
-using System;
 using Descriptors;
-using Event;
 using EventSystem;
 using Mapping;
 using Model;
@@ -40,13 +38,11 @@ namespace Controller
             if (InputController.GetAction(KeyboardAction.Run) && IsMoving)
             {
                 IsRunning = true;
-                EventAPI.DispatchEvent(new SetFieldOfViewEvent(_cameraConfiguration.RunFov));
             }
 
             if (InputController.GetTriggerRelease(KeyboardAction.Run) || !IsMoving)
             {
                 IsRunning = false;
-                EventAPI.DispatchEvent(new SetFieldOfViewEvent(_cameraConfiguration.WalkFov));
             }
         }
 
@@ -82,7 +78,7 @@ namespace Controller
 
             return Vector3.Normalize(rawMovementVector);
         }
-        
+
         private void ApplyGravity()
         {
             if (characterController.isGrounded)
@@ -97,6 +93,5 @@ namespace Controller
             Vector3 gravityMovement = new Vector3(0, fallSpeed, 0);
             characterController.Move(gravityMovement * Time.deltaTime);
         }
-
     }
 }

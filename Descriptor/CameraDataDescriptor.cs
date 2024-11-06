@@ -2,7 +2,7 @@
 
 namespace Descriptors
 {
-    public class CameraDataDescriptor : Descriptor<Camera>
+    public class CameraDataDescriptor : AbstractDescriptor<Camera>
     {
         private readonly Camera _camera = Camera.main;
         public Transform Transform => _camera.transform;

@@ -1,6 +1,6 @@
 ﻿namespace Descriptors
 {
-    public class Descriptor<T>
+    public class AbstractDescriptor<T>
     {
         
     }
