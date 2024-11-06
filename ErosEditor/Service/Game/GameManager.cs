@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Controller.Grid;
+using ErosEditor.Service.Scripting;
 using Service.Application;
 using Service.Application.Exception;
 using Service.Initialization;
@@ -111,6 +112,7 @@ namespace Service.Game
         private void RegisterApplicationServices()
         {
             RegisterApplicationService<GridManagementService>();
+            RegisterApplicationService<ScriptingEngineService>();
         }
 
         private void RegisterInitializationService<T>() where T : InitializationService
