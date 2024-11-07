@@ -187,7 +187,18 @@ namespace ErosScriptingEngine.Executor
                             return value;
                         }
 
-                        ErosScriptingManager.Error("Position value must be in '(x, y, z)' format.",
+                        ErosScriptingManager.Error("Position value must be in 'vec3(x, y, z)' format.",
+                            propertyName);
+                        return null;
+
+                    case TokenType.Rotation:
+                        if (value is Vector3)
+                        {
+                            objectDescriptor.PhysicalObject.transform.eulerAngles = (Vector3)value;
+                            return value;
+                        }
+
+                        ErosScriptingManager.Error("Position value must be in 'vec3(x, y, z)' format.",
                             propertyName);
                         return null;
 
@@ -204,7 +215,11 @@ namespace ErosScriptingEngine.Executor
 
         public object ProcessVec3Expression(Vector3ExpressionNode expression)
         {
-            return expression.Value;
+            object x = Evaluate(expression.X);
+            object y = Evaluate(expression.Y);
+            object z = Evaluate(expression.Z);
+
+            return new Vector3((float)x, (float)y, (float)z);
         }
 
         public object ProcessPrintStatement(PrintStatementNode statement)

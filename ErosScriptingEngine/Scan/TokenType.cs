@@ -12,7 +12,6 @@
         EndOfFile,
         Colon,
         Identifier,
-        Indentation,
         End,
         Update,
         Id,
@@ -30,5 +29,8 @@
         Position,
         Set,
         To,
+        Vec3,
+        Rotation,
+        Comma
     }
 }

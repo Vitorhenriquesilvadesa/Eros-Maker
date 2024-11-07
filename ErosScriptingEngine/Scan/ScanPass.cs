@@ -26,6 +26,8 @@ namespace ErosScriptingEngine.Scan
             { "set", TokenType.Set },
             { "to", TokenType.To },
             { "position", TokenType.Position },
+            { "rotation", TokenType.Rotation },
+            { "vec3", TokenType.Vec3 },
         };
 
         private uint _line;
@@ -79,6 +81,10 @@ namespace ErosScriptingEngine.Scan
 
                 case '.':
                     MakeToken(TokenType.Dot);
+                    break;
+
+                case ',':
+                    MakeToken(TokenType.Comma);
                     break;
 
                 case ':':

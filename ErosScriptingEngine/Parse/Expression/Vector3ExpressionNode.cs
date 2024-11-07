@@ -4,11 +4,16 @@ namespace ErosScriptingEngine.Parse.Expression
 {
     public class Vector3ExpressionNode : ExpressionNode
     {
-        public readonly Vector3 Value;
+        public readonly ExpressionNode X;
+        public readonly ExpressionNode Y;
+        public readonly ExpressionNode Z;
 
-        public Vector3ExpressionNode(Vector3 value)
+
+        public Vector3ExpressionNode(ExpressionNode x, ExpressionNode y, ExpressionNode z)
         {
-            Value = value;
+            X = x;
+            Y = y;
+            Z = z;
         }
 
         public override T AcceptProcessor<T>(IExpressionNodeProcessor<T> processor)

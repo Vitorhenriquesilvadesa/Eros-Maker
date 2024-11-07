@@ -205,6 +205,18 @@ namespace ErosScriptingEngine.Parse
                 return new LiteralExpressionNode(Previous());
             }
 
+            if (Match(TokenType.Vec3))
+            {
+                Consume(TokenType.LeftParen, "Expect '(' after 'vec3'.");
+                ExpressionNode x = Expression();
+                Consume(TokenType.Comma, "Expect ',' after 'x' component.");
+                ExpressionNode y = Expression();
+                Consume(TokenType.Comma, "Expect ',' after 'y' component.");
+                ExpressionNode z = Expression();
+                Consume(TokenType.RightParen, "Expect ')' after vec3 components.");
+                return new Vector3ExpressionNode(x, y, z);
+            }
+
             if (Match(TokenType.LeftParen))
             {
                 return Group();
