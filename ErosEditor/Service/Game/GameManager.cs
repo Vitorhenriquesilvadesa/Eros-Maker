@@ -19,6 +19,8 @@ namespace Service.Game
         private GridRenderingController gridRenderingController;
 
         [SerializeField] private GridMovementController gridMovementController;
+        [SerializeField] private Mesh erosBaseMesh;
+        [SerializeField] private Material erosBaseMaterial;
 
         private static GameManager Instance
         {
@@ -39,6 +41,8 @@ namespace Service.Game
 
         public static GridRenderingController GridRenderingController => Instance.gridRenderingController;
         public static GridMovementController GridMovementController => Instance.gridMovementController;
+        public static Mesh BaseMesh => Instance.erosBaseMesh;
+        public static Material BaseMaterial => Instance.erosBaseMaterial;
 
         private ServiceProvider<InitializationService> initializationServiceProvider;
         private ServiceProvider<ApplicationService> applicationServiceProvider;

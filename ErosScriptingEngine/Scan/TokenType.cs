@@ -25,6 +25,10 @@
         Slash,
         Not,
         LeftParen,
-        RightParen
+        RightParen,
+        Destroy,
+        Position,
+        Set,
+        To,
     }
 }

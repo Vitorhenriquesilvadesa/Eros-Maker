@@ -21,7 +21,11 @@ namespace ErosScriptingEngine.Scan
             { "self", TokenType.Self },
             { "start", TokenType.Start },
             { "update", TokenType.Update },
+            { "destroy", TokenType.Destroy },
             { "name", TokenType.Name },
+            { "set", TokenType.Set },
+            { "to", TokenType.To },
+            { "position", TokenType.Position },
         };
 
         private uint _line;

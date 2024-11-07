@@ -12,18 +12,19 @@ namespace ErosScriptingEngine.Parse
     public class ParsePass : ErosCompilationPass<ScannedData, ErosExecutableScript>
     {
         private List<StatementNode> _statements;
-        private ErosScriptStartEvent _startEvent;
-        private ErosScriptUpdateEvent _updateEvent;
         private List<Token> _tokens;
         private int _current;
 
-        private bool _startEventEmitted;
-        private bool _updateEventEmitted;
+        private readonly Dictionary<Type, ErosScriptEvent> emittedEvents = new();
 
         protected override ErosExecutableScript Pass(ScannedData input)
         {
             ParseTokens(input);
-            return new ErosExecutableScript(_statements, _startEvent, _updateEvent);
+            return new ErosExecutableScript(_statements,
+                (ErosScriptStartEvent)emittedEvents.GetValueOrDefault(typeof(ErosScriptStartEvent), null),
+                (ErosScriptUpdateEvent)emittedEvents.GetValueOrDefault(typeof(ErosScriptUpdateEvent), null),
+                (ErosScriptDestroyEvent)emittedEvents.GetValueOrDefault(typeof(ErosScriptDestroyEvent), null)
+            );
         }
 
         private void ParseTokens(ScannedData input)
@@ -34,20 +35,8 @@ namespace ErosScriptingEngine.Parse
             {
                 StatementNode statement = Statement();
 
-                switch (statement.GetType())
-                {
-                    case { } t when t == typeof(ErosScriptUpdateEvent):
-                        _updateEvent = (ErosScriptUpdateEvent)statement;
-                        break;
-
-                    case { } t when t == typeof(ErosScriptUpdateEvent):
-                        _startEvent = (ErosScriptStartEvent)statement;
-                        break;
-
-                    default:
-                        _statements.Add(statement);
-                        break;
-                }
+                if (!emittedEvents.ContainsKey(statement.GetType()))
+                    _statements.Add(statement);
             }
         }
 
@@ -63,6 +52,7 @@ namespace ErosScriptingEngine.Parse
         {
             if (Match(TokenType.Start)) return StartEventStatement();
             if (Match(TokenType.Update)) return UpdateEventStatement();
+            if (Match(TokenType.Destroy)) return DestroyEventStatement();
 
             ErosScriptingManager.Error("Invalid 'on' keyword usage.", Previous());
             return null;
@@ -71,15 +61,6 @@ namespace ErosScriptingEngine.Parse
         private StatementNode StartEventStatement()
         {
             Consume(TokenType.Colon, "Expect ':' after 'on event' declaration.");
-
-            if (_startEventEmitted)
-            {
-                ErosScriptingManager.Error("Duplicated 'on start' event.", Previous());
-            }
-            else
-            {
-                _startEventEmitted = true;
-            }
 
             List<StatementNode> statements = new();
 
@@ -90,21 +71,23 @@ namespace ErosScriptingEngine.Parse
 
             Consume(TokenType.End, "Missing 'end' keyword after 'on start' block.");
 
-            return new ErosScriptStartEvent(statements);
+            ErosScriptStartEvent e = new ErosScriptStartEvent(statements);
+
+            if (emittedEvents.ContainsKey(typeof(ErosScriptStartEvent)))
+            {
+                ErosScriptingManager.Error("Duplicated 'on start' event.", Previous());
+            }
+            else
+            {
+                emittedEvents.Add(typeof(ErosScriptStartEvent), e);
+            }
+
+            return e;
         }
 
         private StatementNode UpdateEventStatement()
         {
             Consume(TokenType.Colon, "Expect ':' after 'on event' declaration.");
-
-            if (_updateEventEmitted)
-            {
-                ErosScriptingManager.Error("Duplicated 'on update' event.", Previous());
-            }
-            else
-            {
-                _updateEventEmitted = true;
-            }
 
             List<StatementNode> statements = new();
 
@@ -115,7 +98,45 @@ namespace ErosScriptingEngine.Parse
 
             Consume(TokenType.End, "Missing 'end' keyword after 'on update' block.");
 
-            return new ErosScriptUpdateEvent(statements);
+            ErosScriptUpdateEvent e = new ErosScriptUpdateEvent(statements);
+
+            if (emittedEvents.ContainsKey(typeof(ErosScriptUpdateEvent)))
+            {
+                ErosScriptingManager.Error("Duplicated 'on update' event.", Previous());
+            }
+            else
+            {
+                emittedEvents.Add(typeof(ErosScriptUpdateEvent), e);
+            }
+
+            return e;
+        }
+
+        private StatementNode DestroyEventStatement()
+        {
+            Consume(TokenType.Colon, "Expect ':' after 'on event' declaration.");
+
+            List<StatementNode> statements = new();
+
+            while (!IsAtEnd() && !Check(TokenType.End))
+            {
+                statements.Add(Statement());
+            }
+
+            Consume(TokenType.End, "Missing 'end' keyword after 'on update' block.");
+
+            ErosScriptDestroyEvent e = new ErosScriptDestroyEvent(statements);
+
+            if (emittedEvents.ContainsKey(typeof(ErosScriptDestroyEvent)))
+            {
+                ErosScriptingManager.Error("Duplicated 'on destroy' event.", Previous());
+            }
+            else
+            {
+                emittedEvents.Add(typeof(ErosScriptDestroyEvent), e);
+            }
+
+            return e;
         }
 
         private StatementNode ExpressionStatement()
@@ -194,9 +215,23 @@ namespace ErosScriptingEngine.Parse
                 return Match(TokenType.Dot) ? SelfGetExpression() : SelfExpression();
             }
 
+            if (Match(TokenType.Set))
+            {
+                return SetExpression();
+            }
+
             Advance();
             ErosScriptingManager.Error($"Invalid expression: '{Previous().lexeme}'.", Previous());
             return null;
+        }
+
+        private ExpressionNode SetExpression()
+        {
+            ExpressionNode target = Expression();
+            Consume(TokenType.To, "Expect 'to' keyword after variable to set.");
+            ExpressionNode value = Expression();
+
+            return new SetInternalPropertyExpressionNode(target, value);
         }
 
         private ExpressionNode Group()
@@ -208,7 +243,7 @@ namespace ErosScriptingEngine.Parse
 
         private ExpressionNode SelfGetExpression()
         {
-            if (Match(TokenType.Id, TokenType.Name))
+            if (Match(TokenType.Id, TokenType.Name, TokenType.Position))
             {
                 return new GetInternalPropertyExpressionNode(Previous());
             }

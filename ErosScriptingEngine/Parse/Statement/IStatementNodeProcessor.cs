@@ -8,5 +8,6 @@ namespace ErosScriptingEngine.Parse.Statement
         public T ProcessExpressionStatement(ExpressionStatementNode statement);
         public T ProcessStartEvent(ErosScriptStartEvent @event);
         public T ProcessUpdateEvent(ErosScriptUpdateEvent @event);
+        public T ProcessDestroyEvent(ErosScriptDestroyEvent @event);
     }
 }

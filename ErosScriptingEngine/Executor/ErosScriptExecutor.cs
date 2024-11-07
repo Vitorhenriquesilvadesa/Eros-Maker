@@ -129,13 +129,18 @@ namespace ErosScriptingEngine.Executor
 
         public object ProcessGetInternalPropertyExpression(GetInternalPropertyExpressionNode expression)
         {
+            ErosObjectDescriptor objectDescriptor = (ErosObjectDescriptor)target.GetDescriptor();
+
             switch (expression.keyword.Type)
             {
                 case TokenType.Id:
-                    return target.Id;
+                    return objectDescriptor.Id;
 
                 case TokenType.Name:
-                    return target.Name;
+                    return objectDescriptor.Name;
+
+                case TokenType.Position:
+                    return objectDescriptor.PhysicalObject.transform.position;
 
                 default:
                     ErosScriptingManager.Error($"Unknown internal property '{expression.keyword.lexeme}'.",
@@ -152,6 +157,54 @@ namespace ErosScriptingEngine.Executor
         public object ProcessGroupExpression(GroupExpression expression)
         {
             return Evaluate(expression.Expression);
+        }
+
+        public object ProcessSetInternalPropertyExpression(SetInternalPropertyExpressionNode expression)
+        {
+            ErosObjectDescriptor objectDescriptor = (ErosObjectDescriptor)target.GetDescriptor();
+            object value = Evaluate(expression.Value);
+
+            if (expression.Target is GetInternalPropertyExpressionNode)
+            {
+                Token propertyName = ((GetInternalPropertyExpressionNode)expression.Target).keyword;
+
+                switch (propertyName.Type)
+                {
+                    case TokenType.Id:
+                        ErosScriptingManager.Error("Cannot set property 'id'.",
+                            propertyName);
+                        return null;
+
+                    case TokenType.Name:
+                        ErosScriptingManager.Error("Cannot set property 'name'.",
+                            propertyName);
+                        return null;
+
+                    case TokenType.Position:
+                        if (value is Vector3)
+                        {
+                            objectDescriptor.PhysicalObject.transform.position = (Vector3)value;
+                            return value;
+                        }
+
+                        ErosScriptingManager.Error("Position value must be in '(x, y, z)' format.",
+                            propertyName);
+                        return null;
+
+                    default:
+                        ErosScriptingManager.Error($"Unknown internal property '{propertyName.lexeme}'.",
+                            propertyName);
+                        return null;
+                }
+            }
+
+            ErosScriptingManager.Error("Unknown property.");
+            return null;
+        }
+
+        public object ProcessVec3Expression(Vector3ExpressionNode expression)
+        {
+            return expression.Value;
         }
 
         public object ProcessPrintStatement(PrintStatementNode statement)
@@ -185,6 +238,24 @@ namespace ErosScriptingEngine.Executor
             }
 
             return null;
+        }
+
+        public object ProcessDestroyEvent(ErosScriptDestroyEvent @event)
+        {
+            foreach (StatementNode statement in @event.Statements)
+            {
+                Execute(statement);
+            }
+
+            return null;
+        }
+
+        public void CallDestroyEventIfDeclared()
+        {
+            if (attachedScript.DestroyEvent is not null)
+            {
+                Execute(attachedScript.DestroyEvent);
+            }
         }
 
         public void CallStartEventIfDeclared()

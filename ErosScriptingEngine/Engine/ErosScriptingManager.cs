@@ -28,7 +28,7 @@ namespace ErosScriptingEngine.Engine
             _compilationPipeline.InsertStage(parsePass);
 
             ErosScriptableFile file =
-                new ErosScriptableFile("C:\\Users\\vitor\\Desktop\\ErosScriptingTest\\test.eros");
+                new ErosScriptableFile("C:\\Users\\vitor\\OneDrive\\Área de Trabalho\\Test Eros Script\\test.eros");
 
             ErosExecutableScript script =
                 (ErosExecutableScript)_compilationPipeline.RunWithInterceptors(file);

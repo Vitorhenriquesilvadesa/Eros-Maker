@@ -11,18 +11,20 @@ namespace ErosScriptingEngine.Parse
         public readonly List<StatementNode> Statements;
         public readonly ErosScriptStartEvent StartEvent;
         public readonly ErosScriptUpdateEvent UpdateEvent;
+        public readonly ErosScriptDestroyEvent DestroyEvent;
 
         public ErosExecutableScript(List<StatementNode> statements, ErosScriptStartEvent startEvent,
-            ErosScriptUpdateEvent updateEvent)
+            ErosScriptUpdateEvent updateEvent, ErosScriptDestroyEvent destroyEvent)
         {
             Statements = statements;
             StartEvent = startEvent;
             UpdateEvent = updateEvent;
+            DestroyEvent = destroyEvent;
         }
 
         public override object Clone()
         {
-            return new ErosExecutableScript(Statements, StartEvent, UpdateEvent);
+            return new ErosExecutableScript(Statements, StartEvent, UpdateEvent, DestroyEvent);
         }
     }
 }
