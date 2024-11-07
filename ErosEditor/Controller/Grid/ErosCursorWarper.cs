@@ -16,7 +16,7 @@ namespace Controller.Grid
         {
             if (Input.GetMouseButton(1))
             {
-                WarpCursor();
+                //WarpCursor();
             }
         }
 

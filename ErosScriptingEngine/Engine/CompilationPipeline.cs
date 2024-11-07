@@ -15,7 +15,7 @@ namespace ErosScriptingEngine.Engine
             return this;
         }
 
-        public void Run(IErosScriptingIOComponent input)
+        public IErosScriptingIOComponent Run(IErosScriptingIOComponent input)
         {
             var currentInput = input;
             Console.WriteLine("Running without interceptors.");
@@ -24,9 +24,11 @@ namespace ErosScriptingEngine.Engine
             {
                 currentInput = RunPass(pass, currentInput);
             }
+
+            return currentInput;
         }
 
-        public void RunWithInterceptors(IErosScriptingIOComponent input)
+        public IErosScriptingIOComponent RunWithInterceptors(IErosScriptingIOComponent input)
         {
             IErosScriptingIOComponent currentInput = input;
             Console.WriteLine("Running with interceptors.");
@@ -35,6 +37,8 @@ namespace ErosScriptingEngine.Engine
             {
                 currentInput = RunPassWithInterceptors(pass, currentInput);
             }
+
+            return currentInput;
         }
 
         private IErosScriptingIOComponent RunPass(IErosCompilationPass pass,

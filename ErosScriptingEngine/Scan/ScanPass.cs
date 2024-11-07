@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using ErosScriptingEngine.Engine;
 using ErosScriptingEngine.Exception;
 using ErosScriptingEngine.Lexer;
 using ErosScriptingEngine.Pass;
 using ErosScriptingEngine.Util;
+using UnityEngine;
 
 namespace ErosScriptingEngine.Scan
 {
@@ -13,7 +16,12 @@ namespace ErosScriptingEngine.Scan
         {
             { "print", TokenType.Print },
             { "on", TokenType.On },
-            { "start", TokenType.Start }
+            { "end", TokenType.End },
+            { "id", TokenType.Id },
+            { "self", TokenType.Self },
+            { "start", TokenType.Start },
+            { "update", TokenType.Update },
+            { "name", TokenType.Name },
         };
 
         private uint _line;
@@ -46,12 +54,13 @@ namespace ErosScriptingEngine.Scan
                 ScanToken();
             }
 
-            MakeToken(TokenType.EndOfFile);
+            MakeToken(TokenType.EndOfFile, null, null, 0);
         }
 
         private void ScanToken()
         {
             char c = Advance();
+
 
             switch (c)
             {
@@ -64,8 +73,36 @@ namespace ErosScriptingEngine.Scan
                     _line++;
                     break;
 
+                case '.':
+                    MakeToken(TokenType.Dot);
+                    break;
+
                 case ':':
                     MakeToken(TokenType.Colon);
+                    break;
+
+                case '+':
+                    MakeToken(TokenType.Plus);
+                    break;
+
+                case '-':
+                    MakeToken(TokenType.Minus);
+                    break;
+
+                case '*':
+                    MakeToken(TokenType.Star);
+                    break;
+
+                case '/':
+                    MakeToken(TokenType.Slash);
+                    break;
+
+                case '(':
+                    MakeToken(TokenType.LeftParen);
+                    break;
+
+                case ')':
+                    MakeToken(TokenType.RightParen);
                     break;
 
                 case '"':
@@ -78,14 +115,47 @@ namespace ErosScriptingEngine.Scan
                         Identifier();
                         break;
                     }
+                    else if (IsDigit(c))
+                    {
+                        Number();
+                        break;
+                    }
 
                     throw new ErosUnexpectedCharacterException($"Unexpected character '{c}' at line {_line}");
             }
         }
-        
+
+        private void Number()
+        {
+            while (IsDigit(Peek())) Advance();
+
+            if (Peek() == '.' && IsDigit(PeekNext()))
+            {
+                Advance();
+                while (IsDigit(Peek())) Advance();
+            }
+
+            MakeToken(TokenType.Number, float.Parse(_source.Substring(_start, _length),
+                NumberStyles.Float, CultureInfo.InvariantCulture));
+        }
+
         private void String()
         {
-            
+            while (Peek() != '"' && !IsAtEnd())
+            {
+                Advance();
+            }
+
+            if (IsAtEnd())
+            {
+                ErosScriptingManager.Error("Unterminated string.", _line);
+                return;
+            }
+
+            Advance();
+
+            string lexeme = _source.Substring(_start + 1, _length - 2);
+            MakeToken(TokenType.String, lexeme, lexeme, 0);
         }
 
         private void Identifier()
@@ -96,25 +166,25 @@ namespace ErosScriptingEngine.Scan
             }
 
             string name = _source.Substring(_start, _length);
-            MakeToken(_keywords.GetValueOrDefault(name, TokenType.Identifier), name, null);
+            MakeToken(_keywords.GetValueOrDefault(name, TokenType.Identifier), name, null, 0);
         }
 
 
         private void MakeToken(TokenType type)
         {
             string lexeme = _source.Substring(_start, _length);
-            MakeToken(type, lexeme, null);
+            MakeToken(type, lexeme, null, 0);
         }
 
         private void MakeToken(TokenType type, object literal)
         {
             string lexeme = _source.Substring(_start, _length);
-            MakeToken(type, lexeme, literal);
+            MakeToken(type, lexeme, literal, 0);
         }
 
-        private void MakeToken(TokenType type, string lexeme, object literal)
+        private void MakeToken(TokenType type, string lexeme, object literal, uint size)
         {
-            Token token = new Token(type, lexeme, literal, _line);
+            Token token = new Token(type, lexeme, literal, _line, size);
             _tokens.Add(token);
         }
 
@@ -158,6 +228,11 @@ namespace ErosScriptingEngine.Scan
         private char Peek()
         {
             return IsAtEnd() ? '\0' : _source[_start + _length];
+        }
+
+        private char PeekNext()
+        {
+            return _start + _length + 1 >= _source.Length ? '\0' : _source[_start + _length + 1];
         }
 
         private bool IsAtEnd()

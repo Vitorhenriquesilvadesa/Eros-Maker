@@ -1,9 +1,10 @@
-﻿using Entity.Grid;
+﻿using Controller;
+using Entity.Grid;
 using Event.Grid;
 using EventSystem;
 using UnityEngine;
 
-namespace Controller.Grid
+namespace ErosEditor.Controller.Grid
 {
     public class GridInteractionController : ApplicationController<GridInteractionController>
     {

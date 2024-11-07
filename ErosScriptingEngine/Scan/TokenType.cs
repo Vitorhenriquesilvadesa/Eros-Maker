@@ -11,6 +11,20 @@
         Print,
         EndOfFile,
         Colon,
-        Identifier
+        Identifier,
+        Indentation,
+        End,
+        Update,
+        Id,
+        Self,
+        Dot,
+        Name,
+        Minus,
+        Plus,
+        Star,
+        Slash,
+        Not,
+        LeftParen,
+        RightParen
     }
 }

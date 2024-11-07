@@ -8,12 +8,14 @@ namespace ErosScriptingEngine.Util
     public sealed class ErosScriptableFile : ErosScriptingIOComponent<ErosScriptableFile>
     {
         private readonly string source;
+        private readonly string name;
 
         public ErosScriptableFile(string path)
         {
             ErosValidationComponent<string> validator = new FileExtensionValidator("eros");
             validator.Validate(path);
             source = Extract(path);
+            name = Path.GetFileName(path);
         }
 
         public ErosScriptableFile(ErosScriptableFile scriptableFile)
@@ -24,6 +26,11 @@ namespace ErosScriptingEngine.Util
         public string GetSource()
         {
             return source;
+        }
+
+        public string GetName()
+        {
+            return name;
         }
 
         private string Extract(string path)
