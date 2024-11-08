@@ -13,6 +13,8 @@ namespace ErosScriptingEngine.Engine
     {
         private readonly CompilationPipeline _compilationPipeline;
         private readonly Dictionary<string, ErosExecutableScript> _erosExecutableScripts = new();
+        private ErosScriptableFile file;
+        private ErosExecutableScript script;
 
         public ErosScriptingManager()
         {
@@ -27,10 +29,10 @@ namespace ErosScriptingEngine.Engine
             _compilationPipeline.InsertStage(scanPass);
             _compilationPipeline.InsertStage(parsePass);
 
-            ErosScriptableFile file =
+            file =
                 new ErosScriptableFile("C:\\Users\\vitor\\OneDrive\\Área de Trabalho\\Test Eros Script\\test.eros");
 
-            ErosExecutableScript script =
+            script =
                 (ErosExecutableScript)_compilationPipeline.RunWithInterceptors(file);
 
             _erosExecutableScripts.Add(file.GetName(), script);
@@ -60,6 +62,12 @@ namespace ErosScriptingEngine.Engine
         public static void Error(string message, uint line)
         {
             Debug.LogError($"{message} at line {line}.");
+        }
+
+        public void RecompileScripts()
+        {
+            file = new ErosScriptableFile("C:\\Users\\vitor\\OneDrive\\Área de Trabalho\\Test Eros Script\\test.eros");
+            _erosExecutableScripts[file.GetName()] = (ErosExecutableScript)_compilationPipeline.Run(file);
         }
     }
 }

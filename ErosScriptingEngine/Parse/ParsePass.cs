@@ -15,15 +15,15 @@ namespace ErosScriptingEngine.Parse
         private List<Token> _tokens;
         private int _current;
 
-        private readonly Dictionary<Type, ErosScriptEvent> emittedEvents = new();
+        private Dictionary<Type, ErosScriptEvent> _emittedEvents = new();
 
         protected override ErosExecutableScript Pass(ScannedData input)
         {
             ParseTokens(input);
             return new ErosExecutableScript(_statements,
-                (ErosScriptStartEvent)emittedEvents.GetValueOrDefault(typeof(ErosScriptStartEvent), null),
-                (ErosScriptUpdateEvent)emittedEvents.GetValueOrDefault(typeof(ErosScriptUpdateEvent), null),
-                (ErosScriptDestroyEvent)emittedEvents.GetValueOrDefault(typeof(ErosScriptDestroyEvent), null)
+                (ErosScriptStartEvent)_emittedEvents.GetValueOrDefault(typeof(ErosScriptStartEvent), null),
+                (ErosScriptUpdateEvent)_emittedEvents.GetValueOrDefault(typeof(ErosScriptUpdateEvent), null),
+                (ErosScriptDestroyEvent)_emittedEvents.GetValueOrDefault(typeof(ErosScriptDestroyEvent), null)
             );
         }
 
@@ -35,7 +35,7 @@ namespace ErosScriptingEngine.Parse
             {
                 StatementNode statement = Statement();
 
-                if (!emittedEvents.ContainsKey(statement.GetType()))
+                if (!_emittedEvents.ContainsKey(statement.GetType()))
                     _statements.Add(statement);
             }
         }
@@ -73,13 +73,13 @@ namespace ErosScriptingEngine.Parse
 
             ErosScriptStartEvent e = new ErosScriptStartEvent(statements);
 
-            if (emittedEvents.ContainsKey(typeof(ErosScriptStartEvent)))
+            if (_emittedEvents.ContainsKey(typeof(ErosScriptStartEvent)))
             {
                 ErosScriptingManager.Error("Duplicated 'on start' event.", Previous());
             }
             else
             {
-                emittedEvents.Add(typeof(ErosScriptStartEvent), e);
+                _emittedEvents.Add(typeof(ErosScriptStartEvent), e);
             }
 
             return e;
@@ -100,13 +100,13 @@ namespace ErosScriptingEngine.Parse
 
             ErosScriptUpdateEvent e = new ErosScriptUpdateEvent(statements);
 
-            if (emittedEvents.ContainsKey(typeof(ErosScriptUpdateEvent)))
+            if (_emittedEvents.ContainsKey(typeof(ErosScriptUpdateEvent)))
             {
                 ErosScriptingManager.Error("Duplicated 'on update' event.", Previous());
             }
             else
             {
-                emittedEvents.Add(typeof(ErosScriptUpdateEvent), e);
+                _emittedEvents.Add(typeof(ErosScriptUpdateEvent), e);
             }
 
             return e;
@@ -127,13 +127,13 @@ namespace ErosScriptingEngine.Parse
 
             ErosScriptDestroyEvent e = new ErosScriptDestroyEvent(statements);
 
-            if (emittedEvents.ContainsKey(typeof(ErosScriptDestroyEvent)))
+            if (_emittedEvents.ContainsKey(typeof(ErosScriptDestroyEvent)))
             {
                 ErosScriptingManager.Error("Duplicated 'on destroy' event.", Previous());
             }
             else
             {
-                emittedEvents.Add(typeof(ErosScriptDestroyEvent), e);
+                _emittedEvents.Add(typeof(ErosScriptDestroyEvent), e);
             }
 
             return e;
@@ -217,6 +217,11 @@ namespace ErosScriptingEngine.Parse
                 return new Vector3ExpressionNode(x, y, z);
             }
 
+            if (Match(TokenType.DeltaTime, TokenType.Time))
+            {
+                return new SystemPropertyExpressionNode(Previous());
+            }
+
             if (Match(TokenType.LeftParen))
             {
                 return Group();
@@ -255,7 +260,7 @@ namespace ErosScriptingEngine.Parse
 
         private ExpressionNode SelfGetExpression()
         {
-            if (Match(TokenType.Id, TokenType.Name, TokenType.Position))
+            if (Match(TokenType.Id, TokenType.Name, TokenType.Position, TokenType.Rotation))
             {
                 return new GetInternalPropertyExpressionNode(Previous());
             }
@@ -319,6 +324,7 @@ namespace ErosScriptingEngine.Parse
             _current = 0;
             _statements = new List<StatementNode>();
             _tokens = input.Tokens;
+            _emittedEvents = new Dictionary<Type, ErosScriptEvent>();
         }
 
         public override Type GetInputType()

@@ -1,4 +1,5 @@
-﻿using ErosEditor.Service.Scripting;
+﻿using ErosEditor.Service.Application;
+using ErosEditor.Service.Scripting;
 using Service.Application;
 using Service.Application.Exception;
 using Service.Factory;

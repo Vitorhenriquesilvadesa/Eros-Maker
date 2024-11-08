@@ -28,6 +28,8 @@ namespace ErosScriptingEngine.Scan
             { "position", TokenType.Position },
             { "rotation", TokenType.Rotation },
             { "vec3", TokenType.Vec3 },
+            { "dt", TokenType.DeltaTime },
+            { "time", TokenType.Time },
         };
 
         private uint _line;

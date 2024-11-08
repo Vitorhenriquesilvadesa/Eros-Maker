@@ -4,9 +4,10 @@ using Descriptor.Grid;
 using Entity.Grid;
 using Event.Grid;
 using EventSystem;
+using Service.Application;
 using Service.Game;
 
-namespace Service.Application
+namespace ErosEditor.Service.Application
 {
     public class GridManagementService : ApplicationService
     {

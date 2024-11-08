@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Descriptor.Grid;
 using Entity.Grid;
+using ErosEditor.Entity.Grid;
+using ErosEditor.EventSystem;
 using Event.Grid;
 using EventSystem;
 using Scriptable;

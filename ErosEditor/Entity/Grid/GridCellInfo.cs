@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Descriptor.Grid;
+using Entity.Grid;
 using UnityEngine;
 
-namespace Entity.Grid
+namespace ErosEditor.Entity.Grid
 {
     public class GridCellInfo : MonoBehaviour
     {
@@ -9,6 +10,7 @@ namespace Entity.Grid
 
         private Material originalMaterial;
         public Material selectedMaterial;
+        public GridCell cell;
 
         private void Start()
         {
@@ -19,7 +21,7 @@ namespace Entity.Grid
         {
             GetComponent<MeshRenderer>().material = selectedMaterial;
         }
-        
+
         public void Unselect()
         {
             GetComponent<MeshRenderer>().material = originalMaterial;

@@ -1,7 +1,7 @@
-﻿namespace EventSystem
-{
-    using System;
+﻿using System;
 
+namespace ErosEditor.EventSystem
+{
     /// <summary>
     /// O atributo <see cref="Reactive"/> é utilizado para marcar métodos que devem ser registrados como ouvintes (listeners) de eventos reativos.
     /// </summary>

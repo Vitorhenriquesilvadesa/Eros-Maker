@@ -222,6 +222,22 @@ namespace ErosScriptingEngine.Executor
             return new Vector3((float)x, (float)y, (float)z);
         }
 
+        public object ProcessSystemPropertyExpression(SystemPropertyExpressionNode expression)
+        {
+            switch (expression.PropertyName.Type)
+            {
+                case TokenType.DeltaTime:
+                    return Time.deltaTime;
+                
+                case TokenType.Time:
+                    return Time.time;
+
+                default:
+                    ErosScriptingManager.Error($"Unknown system property '{expression.PropertyName.lexeme}'.");
+                    return null;
+            }
+        }
+
         public object ProcessPrintStatement(PrintStatementNode statement)
         {
             object result = Evaluate(statement.Expression);

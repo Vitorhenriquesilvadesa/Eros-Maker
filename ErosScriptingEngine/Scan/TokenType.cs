@@ -31,6 +31,8 @@
         To,
         Vec3,
         Rotation,
-        Comma
+        Comma,
+        DeltaTime,
+        Time
     }
 }

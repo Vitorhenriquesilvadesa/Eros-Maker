@@ -1,5 +1,7 @@
 ﻿using Controller;
 using Entity.Grid;
+using ErosEditor.Entity.Grid;
+using ErosEditor.Event.Grid;
 using Event.Grid;
 using EventSystem;
 using UnityEngine;
@@ -26,8 +28,7 @@ namespace ErosEditor.Controller.Grid
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
             if (!Physics.Raycast(ray, out var hit, Mathf.Infinity, clickableLayer)) return;
-
-
+            
             GridCellInfo gridCell = hit.collider.GetComponent<GridCellInfo>();
 
             if (gridCell is null)

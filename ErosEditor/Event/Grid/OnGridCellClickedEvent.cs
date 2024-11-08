@@ -1,7 +1,8 @@
-﻿using EventSystem.EventSystem;
+﻿using Entity.Grid;
+using EventSystem.EventSystem;
 using UnityEngine;
 
-namespace Event.Grid
+namespace ErosEditor.Event.Grid
 {
     public class OnGridCellClickedEvent : ReactiveEvent
     {
